@@ -64,7 +64,12 @@ class CommunicationZone extends Component {
             try {
                 response = await this.provideSmartAnswer(lastSentMessage);
             } catch (err) {
-                response = `Oh no! There was an error. ${err.response.data.error}`
+                const responseErr = err.response;
+                let errorMessage = "Unknown error!";
+                if (responseErr) {
+                    errorMessage = responseErr.data.error;
+                }
+                response = `Oh no! There was an error. ${errorMessage}`
             }
         }
         this.setState({

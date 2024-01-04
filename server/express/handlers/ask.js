@@ -10,7 +10,7 @@ module.exports = function (req, res) {
 			"error": "Missing prompt"
 		});
 	}
-	const usefulPrompt = prompt.toLowerCase().split(" ").filter(word => !linkWords.has(word)).join(" ");
+	const usefulPrompt = prompt.toLowerCase().split(/[ ,.!?]/).filter(word => !linkWords.has(word)).join(" ");
 	return res.json({
 		prompt: usefulPrompt
 	});

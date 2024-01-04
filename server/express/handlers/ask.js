@@ -2,7 +2,7 @@ const { default: axios } = require("axios");
 
 const linkWords = new Set([
 	"how", "help", "and", "or", "can", "i", "you", "he", "she", "we", "they", "do",
-	"this", "that", "about", "what", "is", "a", "define"
+	"this", "that", "about", "what", "is", "a", "define", "know"
 ]);
 
 module.exports = async function (req, res) {

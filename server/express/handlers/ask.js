@@ -2,7 +2,7 @@ const { default: axios } = require("axios");
 
 const linkWords = new Set([
 	"how", "help", "and", "or", "can", "i", "you", "he", "she", "we", "they", "do",
-	"this", "that", "about"
+	"this", "that", "about", "what", "is", "a", "define"
 ]);
 
 module.exports = async function (req, res) {
@@ -17,6 +17,9 @@ module.exports = async function (req, res) {
 		.split(/[ ,.!?]/)
 		.filter(word => !linkWords.has(word))
 		.join(" ");
+	const basicResponse = {
+		prompt: usefulPrompt
+	};
 	// We will use Wikipedia's API to find a page
 	const { data: { query: { pages }} } = await axios.get("https://en.wikipedia.org/w/api.php", {
 		params: {
@@ -30,10 +33,25 @@ module.exports = async function (req, res) {
 	});
 	if (pages[-1]) {
 		return res.status(404).send({
-			"error": "No page found"
+			"error": "No page found",
+			...basicResponse
 		});
 	}
+	// We get first found page's extract and give it as an answer
+	const { extract } = Object.values(pages)[0];
+	const response = extract
+		.split('. ')
+		.slice(0, 5)
+		.join(". ")
+		.replace(/\n/g, '');
+	if (!response) {
+		return res.status(404).send({
+			error: "No response",
+			...basicResponse
+		})
+	};
 	return res.json({
-		prompt: usefulPrompt
+		...basicResponse,
+		response
 	});
 };

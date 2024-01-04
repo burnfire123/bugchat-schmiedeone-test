@@ -4,7 +4,7 @@ import './App.css';
 
 export default function ChatZone(props) {
 
-  const history = props.chatItem;  
+  const history = props.chatHistory;  
 
   return (
         <div className="innerShadow">

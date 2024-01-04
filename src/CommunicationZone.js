@@ -89,7 +89,7 @@ class CommunicationZone extends Component {
         return (
             <div className="chatHost innerShadow">
                 <ContactWindow />
-                <ChatZone chatItem={history} />
+                <ChatZone chatHistory={history} />
                 <InputZone handleChange={this.handleChange} handleSubmit={this.handleSubmit} value={currentMessage} />
 
             </div>

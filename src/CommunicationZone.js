@@ -32,15 +32,13 @@ class CommunicationZone extends Component {
             this.setState({
                 currentMessage: '',
                 lastSentMessage: message,
-                history: [...history, message]
+                history: this.getLimitedHistory([...history, message])
             });
 
             setTimeout(function () {
                 this.dialogueEngine();
             }.bind(this), 3000);
-
         }
-        this.cleanHistory()
     }
 
     /**
@@ -68,18 +66,22 @@ class CommunicationZone extends Component {
         }
         const response = this.provideRandomAnswer(answerList);
         this.setState({
-            history: [...history, response]
+            history: this.getLimitedHistory([...history, response])
         });
 
     }
 
-    cleanHistory() {
-        const { history } = this.state;
-        if (history.length > 12) {
-            this.setState({
-                history: history.slice(2),
-            });
-        }
+    /**
+     * Limits chat history to {size} number of elements by eliminating first {offset} elements
+     * @param {string[]} history 
+     * @param {number} size
+     * @param {number} offset
+     * @returns 
+     */
+    getLimitedHistory(history, size = 13, offset = 2) {
+        if(history.length > size)
+            return history.slice(offset);
+        return history;
     }
 
     render() {

@@ -43,30 +43,33 @@ class CommunicationZone extends Component {
         this.cleanHistory()
     }
 
+    /**
+     * Returns a random answer from a list of answers
+     * @param {string[]} answerList array of possible answers
+     * @returns a random answer
+     */
+    provideRandomAnswer(answerList) {
+        return answerList[Math.floor(Math.random() * answerList.length)];
+    }
+
     dialogueEngine() {
         const answersBasic = ["can you elaborate?", "and why do you believe that is so?", "can you be more specific?", "what would be your guess?", "I need more details for this one"];
         const answersAdvanced = ["have you check the logs?", "have you tried restarting?", "what does the documentation say?", "Maybe its a typo"]
         const answersAdjust = ["you need to be a bit more specific", "come on I am trying to help", "whatever", "that does not sound like a bug"]
         const { lastSentMessage, history } = this.state;
+        let answerList = [];
 
         if (lastSentMessage.length <= 7) {
-            let response = answersAdjust[Math.floor(Math.random() * answersAdjust.length)];
-            this.setState({
-                history: [...history, response]
-            });
-        } else if (history.length <= 3 && lastSentMessage.length > 6) {
-            let response = answersBasic[Math.floor(Math.random() * answersBasic.length)];
-            this.setState({
-                history: [...history, response]
-            });
-        } else if (history.length >= 4) {
-            let response = answersAdvanced[Math.floor(Math.random() * answersAdvanced.length)];
-            this.setState({
-                history: [...history, response]
-            });
-
-
+            answerList = answersAdjust;
+        } else if (history.length <= 3) {
+            answerList = answersBasic;
+        } else {
+            answerList = answersAdvanced;
         }
+        const response = this.provideRandomAnswer(answerList);
+        this.setState({
+            history: [...history, response]
+        });
 
     }
 

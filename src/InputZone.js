@@ -6,6 +6,13 @@ import SendIcon from '@material-ui/icons/Send';
 import './App.css';
 
 export default function InputZone(props) {
+  const { handleSendMessage } = props;
+  function handleChatBoxKeyPress(event) {
+    if (event.key === 'Enter') {
+      const message = event.target.value;
+      handleSendMessage(message);
+    }
+  }
   return (
     <Paper className="root">
       <InputBase
@@ -13,7 +20,7 @@ export default function InputZone(props) {
         placeholder="Enter Message..."
         inputProps={{ 'aria-label': 'Enter...' }}
         value={props.value}
-        onKeyPress={props.handleSubmit}
+        onKeyPress={handleChatBoxKeyPress}
         onChange={props.handleChange}
 
       />

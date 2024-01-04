@@ -15,7 +15,7 @@ class CommunicationZone extends Component {
         }
 
         this.handleChange = this.handleChange.bind(this);
-        this.handleSubmit = this.handleSubmit.bind(this);
+        this.handleSendMessage = this.handleSendMessage.bind(this);
     }
 
     handleChange(event) {
@@ -25,20 +25,17 @@ class CommunicationZone extends Component {
         });
     }
 
-    handleSubmit(event) {
+    handleSendMessage(message) {
         const { history } = this.state;
-        const message = event.target.value;
-        if (event.key === 'Enter') {
-            this.setState({
-                currentMessage: '',
-                lastSentMessage: message,
-                history: this.getLimitedHistory([...history, message])
-            });
+        this.setState({
+            currentMessage: '',
+            lastSentMessage: message,
+            history: this.getLimitedHistory([...history, message])
+        });
 
-            setTimeout(function () {
-                this.dialogueEngine();
-            }.bind(this), 3000);
-        }
+        setTimeout(function () {
+            this.dialogueEngine();
+        }.bind(this), 3000);
     }
 
     /**
@@ -79,7 +76,7 @@ class CommunicationZone extends Component {
      * @returns 
      */
     getLimitedHistory(history, size = 13, offset = 2) {
-        if(history.length > size)
+        if (history.length > size)
             return history.slice(offset);
         return history;
     }
@@ -90,7 +87,7 @@ class CommunicationZone extends Component {
             <div className="chatHost innerShadow">
                 <ContactWindow />
                 <ChatZone chatHistory={history} />
-                <InputZone handleChange={this.handleChange} handleSubmit={this.handleSubmit} value={currentMessage} />
+                <InputZone handleChange={this.handleChange} handleSendMessage={this.handleSendMessage} value={currentMessage} />
 
             </div>
 

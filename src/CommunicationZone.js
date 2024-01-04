@@ -1,4 +1,4 @@
-import React, {Component} from 'react';
+import React, { Component } from 'react';
 import './App.css';
 import InputZone from './InputZone';
 import ChatZone from './ChatZone';
@@ -9,90 +9,90 @@ class CommunicationZone extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            value : '',
-            disposable : '',
-            history : ["How can I help?"],
+            currentMessage: '',
+            lastSentMessage: '',
+            history: ["How can I help?"],
         }
 
         this.handleChange = this.handleChange.bind(this);
-        this.handleSubmit = this.handleSubmit.bind(this);
+        this.handleSendMessage = this.handleSendMessage.bind(this);
     }
 
     handleChange(event) {
-        
+
         this.setState({
-                value: event.target.value
-            }); 
-      }
+            currentMessage: event.target.value
+        });
+    }
 
-      handleSubmit(event){
-        
-        if (event.key === 'Enter') {
-            this.setState({
-                value: '',
-                disposable : event.target.value,
-                history : [...this.state.history, event.target.value]
-            });
+    handleSendMessage(message) {
+        const { history } = this.state;
+        this.setState({
+            currentMessage: '',
+            lastSentMessage: message,
+            history: this.getLimitedHistory([...history, message])
+        });
 
-            setTimeout(function() {
-                this.dialogueEngine();
-            }.bind(this), 3000);
-            
-        }  
-        this.cleanHistory()
-      }
+        setTimeout(function () {
+            this.dialogueEngine();
+        }.bind(this), 3000);
+    }
 
-      dialogueEngine(){
-        const answersBasic = ["can you elaborate?","and why do you believe that is so?","can you be more specific?","what would be your guess?","I need more details for this one"]; 
-        const answersAdvanced = ["have you check the logs?","have you tried restarting?","what does the documentation say?", "Maybe its a typo"]
-        const answersAdjust = ["you need to be a bit more specific","come on I am trying to help","whatever","that does not sound like a bug"]
-        
-        if (this.state.disposable.length <= 7) {
-            let response = answersAdjust[Math.floor(Math.random()*answersAdjust.length)];
-            this.setState({
-                history : [...this.state.history, response]
-            });
-        } else if (this.state.history.length <= 3 && this.state.disposable.length > 6) {
-            let response = answersBasic[Math.floor(Math.random()*answersBasic.length)];
-            this.setState({
-                history : [...this.state.history, response]
-            });
-        } else if (this.state.history.length >= 4) {
-            let response = answersAdvanced[Math.floor(Math.random()*answersAdvanced.length)];
-            this.setState({
-                history : [...this.state.history, response]
-            });
+    /**
+     * Returns a random answer from a list of answers
+     * @param {string[]} answerList array of possible answers
+     * @returns a random answer
+     */
+    provideRandomAnswer(answerList) {
+        return answerList[Math.floor(Math.random() * answerList.length)];
+    }
 
+    dialogueEngine() {
+        const answersBasic = ["can you elaborate?", "and why do you believe that is so?", "can you be more specific?", "what would be your guess?", "I need more details for this one"];
+        const answersAdvanced = ["have you check the logs?", "have you tried restarting?", "what does the documentation say?", "Maybe its a typo"]
+        const answersAdjust = ["you need to be a bit more specific", "come on I am trying to help", "whatever", "that does not sound like a bug"]
+        const { lastSentMessage, history } = this.state;
+        let answerList = [];
 
+        if (lastSentMessage.length <= 7) {
+            answerList = answersAdjust;
+        } else if (history.length <= 3) {
+            answerList = answersBasic;
+        } else {
+            answerList = answersAdvanced;
         }
-            
-        }
-        
-        cleanHistory(){
-            const tempHistory = this.state.history;
-            let newHistory = [];
-            if (this.state.history.length > 12) {
-                tempHistory.shift();
-                tempHistory.shift();
-                newHistory = tempHistory;
-                this.setState({
-                    history: newHistory,
-                }); 
-            }
-        }
+        const response = this.provideRandomAnswer(answerList);
+        this.setState({
+            history: this.getLimitedHistory([...history, response])
+        });
 
-  render() {
+    }
 
-  return (
-      <div className="chatHost innerShadow">
-    <ContactWindow/>
-    <ChatZone chatItem={this.state.history}/>
-    <InputZone handleChange={this.handleChange} handleSubmit={this.handleSubmit} value={this.state.value}/>
-    
-    </div>
-    
-  );
-}
+    /**
+     * Limits chat history to {size} number of elements by eliminating first {offset} elements
+     * @param {string[]} history 
+     * @param {number} size
+     * @param {number} offset
+     * @returns 
+     */
+    getLimitedHistory(history, size = 13, offset = 2) {
+        if (history.length > size)
+            return history.slice(offset);
+        return history;
+    }
+
+    render() {
+        const { currentMessage, history } = this.state;
+        return (
+            <div className="chatHost innerShadow">
+                <ContactWindow />
+                <ChatZone chatHistory={history} />
+                <InputZone handleChange={this.handleChange} handleSendMessage={this.handleSendMessage} value={currentMessage} />
+
+            </div>
+
+        );
+    }
 
 }
 

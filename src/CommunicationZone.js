@@ -3,11 +3,13 @@ import './App.css';
 import InputZone from './InputZone';
 import ChatZone from './ChatZone';
 import ContactWindow from './ContactWindow';
+import { promptService } from './PromptService';
 
 
 class CommunicationZone extends Component {
     constructor(props) {
         super(props);
+        this.promptService = promptService;
         this.state = {
             currentMessage: '',
             lastSentMessage: '',
@@ -47,25 +49,32 @@ class CommunicationZone extends Component {
         return answerList[Math.floor(Math.random() * answerList.length)];
     }
 
-    dialogueEngine() {
-        const answersBasic = ["can you elaborate?", "and why do you believe that is so?", "can you be more specific?", "what would be your guess?", "I need more details for this one"];
-        const answersAdvanced = ["have you check the logs?", "have you tried restarting?", "what does the documentation say?", "Maybe its a typo"]
+    async provideSmartAnswer(prompt) {
+        return this.promptService.getAnswer(prompt);
+    }
+
+    async dialogueEngine() {
         const answersAdjust = ["you need to be a bit more specific", "come on I am trying to help", "whatever", "that does not sound like a bug"]
         const { lastSentMessage, history } = this.state;
-        let answerList = [];
+        let response = "";
 
-        if (lastSentMessage.length <= 7) {
-            answerList = answersAdjust;
-        } else if (history.length <= 3) {
-            answerList = answersBasic;
+        if (lastSentMessage.length <= 4) {
+            response = this.provideRandomAnswer(answersAdjust);
         } else {
-            answerList = answersAdvanced;
+            try {
+                response = await this.provideSmartAnswer(lastSentMessage);
+            } catch (err) {
+                const responseErr = err.response;
+                let errorMessage = "Unknown error!";
+                if (responseErr) {
+                    errorMessage = responseErr.data.error;
+                }
+                response = `Oh no! There was an error. ${errorMessage}`
+            }
         }
-        const response = this.provideRandomAnswer(answerList);
         this.setState({
             history: this.getLimitedHistory([...history, response])
         });
-
     }
 
     /**
